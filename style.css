@@ -1,0 +1,298 @@
+body {
+    background: #f0f0f0;
+}
+.navigat {
+    display: block;
+    overflow: hidden;
+    background: #fff;
+}
+.navigat h2 {
+    float: left;
+    font-size: 16px;
+    color: #333;
+    font-weight: 600;
+    padding: 14px 10px;
+    text-transform: uppercase;
+}
+.homepromo {
+    clear: both;
+    display: block;
+    background: #fff;
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-flex-flow: row wrap;
+    flex-flow: row wrap;
+    flex: 1 100%;
+    border-top: 1px solid #eee;
+    margin-bottom: 15px;
+    position: relative;
+    overflow: hidden;
+    height: 351px;
+    overflow: hidden;
+}
+.homepromo .item {
+    position: relative;
+    overflow: hidden;
+}
+.homepromo a {
+    display: block;
+    overflow: hidden;
+    background: #fff;
+    padding: 10px 0;
+}
+.homepromo img {
+    display: block;
+    width: 180px;
+    height: 180px;
+    margin: 15px auto;
+    transition: all ease 300ms;
+}
+.homepromo h3 {
+    display: block;
+    line-height: 1.3em;
+    font-size: 14px;
+    color: #333;
+    margin: 0 10px;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+.homepromo .price {
+    display: block;
+    overflow: hidden;
+    padding: 5px 10px 10px 10px;
+}
+.homepromo strong {
+    display: inline-block;
+    vertical-align: middle;
+    overflow: hidden;
+    font-size: 14px;
+    color: #e10c00;
+    line-height: 15px;
+}
+.homepromo span {
+    display: inline-block;
+    vertical-align: middle;
+    font-size: 12px;
+    text-decoration: line-through;
+    margin-left: 5px;
+    color: #222;
+}
+.homepromo label {
+    display: inline-block;
+    position: absolute;
+    top: 187px;
+    left: 10px;
+    font-size: 11px;
+    color: #fff;
+    font-weight: 600;
+    background: #3fb846;
+    border-radius: 2px;
+    padding: 0 5px;
+    height: 18px;
+}
+.homepromo .promo.noimage p {
+    margin-left: 0;
+    width: auto;
+}
+
+.homepromo .promo p {
+    font-size: 12px;
+    color: #333;
+    white-space: normal;
+    line-height: 1.4;
+    width: 155px;
+    float: left;
+    margin-left: 10px;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+.homepromo .promo img {
+    display: block;
+    width: 35px;
+    height: 35px;
+    margin: 0;
+    float: left;
+}
+p {
+    -webkit-margin-before: 0;
+    -webkit-margin-after: 0;
+    -webkit-margin-start: 0;
+    -webkit-margin-end: 0;
+    text-rendering: geometricPrecision;
+}
+.homepromo .promo {
+    display: block;
+    padding: 0 10px;
+    margin: 0 10px 0 0;
+    white-space: nowrap;
+}
+.owl-carousel {
+    display: none;
+    position: relative;
+    width: 100%;
+    -ms-touch-action: pan-y;
+}
+.owl-carousel .owl-wrapper-outer {
+    overflow: hidden;
+    position: relative;
+    width: 100%;
+}
+.owl-carousel .owl-item {
+    float: left;
+}
+.owl-controls {
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+}
+.navigat div {
+    float: right;
+    overflow: hidden;
+}
+.navigat a {
+    display: inline-block;
+    vertical-align: middle;
+    font-size: 14px;
+    color: #288ad6;
+    padding: 14px 15px;
+}
+a {
+    text-decoration: none;
+}
+.homeproduct {
+    clear: both;
+    display: block;
+    background: #fff;
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-flex-flow: row wrap;
+    flex-flow: row wrap;
+    flex: 1 100%;
+    border-top: 1px solid #eee;
+    margin-bottom: 15px;
+}
+
+ul, ol {
+    list-style: none;
+}
+.homeproduct li.feature {
+    width: 39.917%;
+}
+.homeproduct li {
+    float: left;
+    position: relative;
+    width: 19.917%;
+    overflow: hidden;
+    border-right: 1px solid #eee;
+    border-bottom: 1px solid #eee;
+}
+.homeproduct li a {
+    display: block;
+    overflow: hidden;
+    background: #fff;
+    padding: 10px 0;
+}
+.homeproduct li .price {
+    display: block;
+    overflow: hidden;
+    padding: 5px 10px 10px 10px;
+}
+.homeproduct li strong {
+    display: inline-block;
+    vertical-align: middle;
+    overflow: hidden;
+    font-size: 14px;
+    color: #e10c00;
+    line-height: 15px;
+}
+.homeproduct li span {
+    display: inline-block;
+    vertical-align: middle;
+    font-size: 12px;
+    text-decoration: line-through;
+    margin-left: 5px;
+    color: #222;
+}
+.homeproduct li h3 {
+    display: block;
+    line-height: 1.3em;
+    font-size: 14px;
+    padding: 0 10px;
+    color: #333;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+.homeproduct li .promo {
+    display: block;
+    padding: 0 10px;
+    margin: 0 10px 0 0;
+    margin: 0;
+}
+.homeproduct li label.discount {
+    background-image: linear-gradient(-90deg,#ec1f1f 0%,#ff9c00 100%);
+    border-radius: 10px;
+    padding: 1px 7px;
+    padding-left: 0;
+    padding-right: 10px;
+}
+
+.homeproduct li label {
+    display: inline-block;
+    position: absolute;
+    top: 187px;
+    left: 10px;
+    font-size: 11px;
+    color: #fff;
+    font-weight: 600;
+    background: #3fb846;
+    border-radius: 2px;
+    padding: 0 5px;
+    height: 18px;
+}
+.homeproduct li.feature img {
+    width: 480px;
+    height: 222px;
+    margin: 0 0 14px;
+}
+.homeproduct li img {
+    display: block;
+    width: 180px;
+    height: 180px;
+    margin: 15px auto;
+}.homeproduct li .promo p {
+    font-size: 12px;
+    color: #333;
+    line-height: 1.4;
+    width: 165px;
+    float: left;
+    margin-left: 10px;
+    white-space: normal;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+.homeproduct li .promo img {
+    display: block;
+    width: 35px;
+    height: 35px;
+    float: left;
+    margin: 0;
+}
