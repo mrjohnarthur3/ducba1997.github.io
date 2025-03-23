@@ -1,0 +1,253 @@
+<template>
+  <div class="container video-container">
+    <h1 class="text-center mb-4">Upload và Ghi Video</h1>
+
+    <!-- Upload video -->
+    <div class="row mb-3">
+      <div class="col-md-8">
+        <input type="file" id="videoInput" accept="video/*" class="form-control" @change="handleFileUpload">
+      </div>
+      <div class="col-md-4">
+        <button @click="deleteVideo" class="btn btn-danger w-100">Xóa Video</button>
+      </div>
+    </div>
+
+    <!-- Video gốc -->
+    <video id="sourceVideo" class="source-video" controls loop :src="sourceVideoSrc"></video>
+
+    <!-- Nút Start, Preview, Path và Progress Bar -->
+    <div class="controls mb-4">
+      <button @click="startRecording" class="btn btn-primary btn-lg" :disabled="isRecording">Start Ghi (13.7s)</button>
+      <div class="preview-container mt-3">
+        <video id="previewVideo" class="preview-video" muted :src-object.prop="previewStream"></video>
+        <div class="play-overlay" v-show="showPlayOverlay" @click="playRecordedVideo"></div>
+      </div>
+      
+      <div class="progress mt-3" v-show="isRecording">
+        <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" :style="{ width: progress + '%' }"></div>
+      </div>
+    </div>
+
+    <!-- Video đã ghi và nút Download -->
+    <h3 class="text-center mb-3">Video Đã Ghi</h3>
+    <video id="recordedVideo" class="recorded-video" controls :src="recordedVideoSrc"></video>
+    <div class="text-center">
+      <button v-show="recordedVideoSrc" class="btn btn-success" @click="downloadVideo">Download Video</button>
+    </div>
+  </div>
+</template>
+
+<script>
+import Step from './Step.vue';
+
+export default {
+  name: 'VideoRecorder',
+  components: {
+    Step
+  },
+  data() {
+    return {
+      arrows: [
+        { position: { x: 80, y: 0 }, direction: 'up', progress: 0 },
+        { position: { x: 160, y: 80 }, direction: 'right', progress: 0 },
+        { position: { x: 80, y: 160 }, direction: 'down', progress: 0 },
+        { position: { x: 0, y: 80 }, direction: 'left', progress: 0 },
+        { position: { x: 80, y: 80 }, direction: 'up', progress: 0 }
+      ],
+      sourceVideoSrc: '',
+      recordedVideoSrc: '',
+      previewStream: null,
+      isRecording: false,
+      progress: 0,
+      showPlayOverlay: false,
+      stepPosition: { x: 0, y: 20 },
+      stepDirection: 'up',
+      recorder: null,
+      chunks: [],
+      recordedBlob: null,
+      sourceVideo: null,
+      recordedVideo: null
+    };
+  },
+  methods: {
+    // Upload video
+    handleFileUpload(e) {
+      const file = e.target.files[0];
+      if (file) {
+        this.sourceVideoSrc = URL.createObjectURL(file);
+        this.$nextTick(() => {
+          this.sourceVideo = document.getElementById('sourceVideo');
+          this.sourceVideo.loop = true;
+          this.sourceVideo.play();
+        });
+      }
+    },
+
+    // Xóa video
+    deleteVideo() {
+      this.sourceVideoSrc = '';
+      this.recordedVideoSrc = '';
+      this.previewStream = null;
+      this.showPlayOverlay = false;
+      this.stepPosition = { x: 0, y: 20 };
+      this.stepDirection = 'up';
+      this.chunks = [];
+      document.getElementById('videoInput').value = '';
+    },
+
+    // Ghi video
+    startRecording() {
+      if (!this.sourceVideoSrc) {
+        alert('Hãy upload video trước!');
+        return;
+      }
+
+      const stream = this.sourceVideo.captureStream();
+      this.recorder = new MediaRecorder(stream);
+      this.chunks = [];
+
+      // Hiển thị preview
+      const previewVideo = document.getElementById('previewVideo');
+      previewVideo.srcObject = stream;
+      this.previewStream = stream;
+      previewVideo.play();
+
+      this.recorder.ondataavailable = (e) => this.chunks.push(e.data);
+      this.recorder.onstop = () => {
+        this.recordedBlob = new Blob(this.chunks, { type: 'video/webm' });
+        this.recordedVideoSrc = URL.createObjectURL(this.recordedBlob);
+        this.$nextTick(() => {
+          this.recordedVideo = document.getElementById('recordedVideo');
+          this.recordedVideo.play();
+        });
+        this.showPlayOverlay = true;
+        this.previewStream = null;
+        this.isRecording = false;
+      };
+
+      this.recorder.start();
+      this.isRecording = true;
+      this.progress = 0;
+      this.showPlayOverlay = false;
+      this.stepPosition = { x: 0, y: 20 };
+      this.stepDirection = 'up';
+      console.log('Đang ghi...');
+
+      // Cập nhật progress và di chuyển step
+      let time = 0;
+      const totalTime = 13700; // 13.7s
+      const pathPoints = [
+        { x: 0, y: 20, direction: 'up' },    // Điểm đầu
+        { x: 50, y: 0, direction: 'right' }, // Lên
+        { x: 100, y: 40, direction: 'down' }, // Xuống
+        { x: 150, y: 0, direction: 'left' }, // Lên
+        { x: 200, y: 20, direction: 'up' }   // Điểm cuối
+      ];
+      const segmentDuration = totalTime / (pathPoints.length - 1);
+
+      const interval = setInterval(() => {
+        time += 100;
+        this.progress = (time / totalTime) * 100;
+
+        // Tính vị trí và hướng của step
+        const segmentIndex = Math.floor(time / segmentDuration);
+        const segmentProgress = (time % segmentDuration) / segmentDuration;
+        if (segmentIndex < pathPoints.length - 1) {
+          const startPoint = pathPoints[segmentIndex];
+          const endPoint = pathPoints[segmentIndex + 1];
+          const currentX = startPoint.x + (endPoint.x - startPoint.x) * segmentProgress;
+          const currentY = startPoint.y + (endPoint.y - startPoint.y) * segmentProgress;
+          this.stepPosition = { x: currentX, y: currentY };
+          this.stepDirection = endPoint.direction;
+        }
+
+        if (time >= totalTime) {
+          clearInterval(interval);
+        }
+      }, 100);
+
+      // Dừng sau 13.7 giây
+      setTimeout(() => {
+        this.recorder.stop();
+        console.log('Đã ghi xong.');
+      }, totalTime);
+    },
+
+    // Phát video đã ghi
+    playRecordedVideo() {
+      this.recordedVideo.play();
+    },
+
+    // Download video
+    downloadVideo() {
+      if (this.recordedBlob) {
+        const url = URL.createObjectURL(this.recordedBlob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'recorded-video.webm';
+        a.click();
+        URL.revokeObjectURL(url);
+      }
+    }
+  }
+};
+</script>
+
+<style scoped>
+.video-container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+video {
+  width: 100%;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  margin-bottom: 15px;
+}
+.controls {
+  text-align: center;
+}
+h1, h3 {
+  color: #343a40;
+}
+.preview-container {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  margin: 0 auto;
+}
+.preview-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 2px solid #007bff;
+}
+.recorded-video {
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+}
+.path-container {
+  position: relative;
+  width: 200px;
+  height: 50px;
+  margin: 10px auto;
+}
+.play-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: none;
+  cursor: pointer;
+}
+.play-overlay::before {
+  content: '▶';
+  font-size: 40px;
+  color: white;
+  text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+}
+.play-overlay[v-show] {
+  display: block;
+}
+</style>
