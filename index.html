@@ -75,7 +75,7 @@
     <h2 class="text-white">Quay Video với Hướng Ngẫu Nhiên</h2>
 
     <div class="video-circle">
-      <video id="video" autoplay playsinline webkit-playsinline></video>
+      <video id="video" autoplay playsinline></video>
     </div>
 
     <button id="startBtn" class="btn btn-primary btn-custom">
@@ -109,30 +109,39 @@
 
       let mediaRecorder;
       let recordedChunks = [];
+      let stream;
       let currentStep = 0;
-      const stepDirections = [
-        "Trái ⬅️",
-        "Phải ➡️",
-        "Lên ⬆️",
-        "Trái ⬅️",
-        "Phải ➡️",
-      ];
+      const stepDirections = ["Trái ⬅️", "Phải ➡️", "Lên ⬆️", "Trái ⬅️", "Phải ➡️"];
 
-      async function startRecording() {
+      // 👉 Mở camera ngay khi vào trang
+      async function initCamera() {
+        try {
+          stream = await navigator.mediaDevices.getUserMedia({
+            video: {
+              facingMode: "environment",
+              width: { max: 640 },
+              aspectRatio: 1,
+            },
+          });
+          video.srcObject = stream;
+        } catch (error) {
+          console.error("Lỗi khi mở camera:", error);
+        }
+      }
+
+      // 👉 Khi ấn "Bắt đầu" thì mới ghi video
+      function startRecording() {
         startBtn.style.display = "none";
         progressContainer.style.display = "block";
 
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: {
-            facingMode: "environment",
-            width: { max: 640 },
-            aspectRatio: 1,
-          },
-        });
-        video.srcObject = stream;
+        if (!stream) {
+          console.error("Không tìm thấy stream video!");
+          return;
+        }
+
+        recordedChunks = [];
         mediaRecorder = new MediaRecorder(stream);
-        mediaRecorder.ondataavailable = (event) =>
-          recordedChunks.push(event.data);
+        mediaRecorder.ondataavailable = (event) => recordedChunks.push(event.data);
         mediaRecorder.start();
 
         startSteps();
@@ -185,6 +194,9 @@
       function reset() {
         location.reload();
       }
+
+      // 👉 Gọi `initCamera()` ngay khi trang load
+      initCamera();
 
       startBtn.addEventListener("click", startRecording);
       downloadBtn.addEventListener("click", downloadVideo);
