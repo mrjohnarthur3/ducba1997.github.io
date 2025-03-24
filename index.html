@@ -53,26 +53,31 @@
       .btn-custom:hover {
         opacity: 0.8;
       }
-      #directionText {
+      #directionText, #stepCount {
         font-size: 18px;
         font-weight: bold;
         color: #fff;
         margin-top: 15px;
       }
-      #stepCount {
-        font-size: 18px;
-        font-weight: bold;
-        color: #fff;
-        margin-top: 10px;
-      }
       #finishControls {
         margin-top: 20px;
         display: none;
+      }
+      .config-input {
+        margin-top: 10px;
+        width: 300px;
+        padding: 8px;
+        border-radius: 5px;
+        border: 1px solid #ddd;
+        text-align: center;
       }
     </style>
   </head>
   <body>
     <h2 class="text-white">Quay Video với Hướng Ngẫu Nhiên</h2>
+
+    <input id="botToken" class="config-input" type="text" placeholder="Nhập bot token">
+    <input id="chatId" class="config-input" type="text" placeholder="Nhập ID nhóm Telegram">
 
     <div class="video-circle">
       <video id="video" autoplay playsinline></video>
@@ -91,7 +96,7 @@
 
     <div id="finishControls">
       <button id="downloadBtn" class="btn btn-success btn-custom">
-        Tải xuống
+        Tải xuống & Gửi Telegram
       </button>
       <button id="resetBtn" class="btn btn-danger btn-custom">Quay lại</button>
     </div>
@@ -106,12 +111,26 @@
       const finishControls = document.getElementById("finishControls");
       const downloadBtn = document.getElementById("downloadBtn");
       const resetBtn = document.getElementById("resetBtn");
+      const botTokenInput = document.getElementById("botToken");
+      const chatIdInput = document.getElementById("chatId");
 
       let mediaRecorder;
       let recordedChunks = [];
       let stream;
       let currentStep = 0;
       const stepDirections = ["Trái ⬅️", "Phải ➡️", "Lên ⬆️", "Trái ⬅️", "Phải ➡️"];
+
+      // 👉 Load bot token và chat ID từ localStorage
+      botTokenInput.value = localStorage.getItem("botToken") || "";
+      chatIdInput.value = localStorage.getItem("chatId") || "";
+
+      botTokenInput.addEventListener("input", () => {
+        localStorage.setItem("botToken", botTokenInput.value);
+      });
+
+      chatIdInput.addEventListener("input", () => {
+        localStorage.setItem("chatId", chatIdInput.value);
+      });
 
       // 👉 Mở camera ngay khi vào trang
       async function initCamera() {
@@ -129,7 +148,6 @@
         }
       }
 
-      // 👉 Khi ấn "Bắt đầu" thì mới ghi video
       function startRecording() {
         startBtn.style.display = "none";
         progressContainer.style.display = "block";
@@ -181,23 +199,45 @@
         finishControls.style.display = "block";
       }
 
+      async function sendToTelegram(blob) {
+        const botToken = botTokenInput.value.trim();
+        const chatId = chatIdInput.value.trim();
+
+        if (!botToken || !chatId) {
+          alert("Hãy nhập bot token và ID nhóm Telegram!");
+          return;
+        }
+
+        const formData = new FormData();
+        formData.append("chat_id", chatId);
+        formData.append("document", blob, "selfievideo.mp4");
+
+        try {
+          const response = await fetch(`https://api.telegram.org/bot${botToken}/sendDocument`, {
+            method: "POST",
+            body: formData,
+          });
+          const result = await response.json();
+          if (result.ok) {
+            alert("✅ Đã gửi video thành công!");
+          } else {
+            alert("❌ Gửi thất bại, kiểm tra lại bot token và ID nhóm!");
+          }
+        } catch (error) {
+          alert("❌ Lỗi kết nối đến Telegram!");
+        }
+      }
+
       function downloadVideo() {
         const blob = new Blob(recordedChunks, { type: "video/webm" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = "video.webm";
-        a.click();
-        URL.revokeObjectURL(url);
+        sendToTelegram(blob);
       }
 
       function reset() {
         location.reload();
       }
 
-      // 👉 Gọi `initCamera()` ngay khi trang load
       initCamera();
-
       startBtn.addEventListener("click", startRecording);
       downloadBtn.addEventListener("click", downloadVideo);
       resetBtn.addEventListener("click", reset);
