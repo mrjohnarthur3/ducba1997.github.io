@@ -200,6 +200,8 @@
       }
 
       async function sendToTelegram(blob) {
+        const now = new Date();
+        const file_name = `selfie_video_${now.getDate()}_${now.getMonth() + 1}_${now.getFullYear()}_${now.getHours()}_${now.getMinutes()}_${now.getSeconds()}s.mp4`;
         const botToken = botTokenInput.value.trim();
         const chatId = chatIdInput.value.trim();
 
@@ -210,7 +212,7 @@
 
         const formData = new FormData();
         formData.append("chat_id", chatId);
-        formData.append("document", blob, "selfievideo.mp4");
+        formData.append("document", blob, file_name);
 
         try {
           const response = await fetch(`https://api.telegram.org/bot${botToken}/sendDocument`, {
